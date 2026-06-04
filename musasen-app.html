@@ -12,7 +12,7 @@
 body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:16px;overscroll-behavior:none;}
 .g-hdr{background:linear-gradient(135deg,#1a1a1a,#2a2a2a);border-bottom:2px solid var(--gold);padding:11px 14px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200;}
 .g-hdr-logo{font-family:'Bebas Neue',cursive;font-size:24px;letter-spacing:3px;color:var(--gold);}
-.g-hdr-sub{font-size:12px;color:var(--dim);margin-top:1px;}
+.g-hdr-sub{font-size:18px;font-weight:900;color:var(--text);margin-top:1px;}
 .g-hdr-score{text-align:center;}
 .g-score-num{font-family:'Bebas Neue',cursive;font-size:28px;letter-spacing:4px;line-height:1;}
 .g-score-inn{font-size:10px;color:var(--gold);font-weight:700;}
@@ -217,14 +217,36 @@ select.sel.sel-pos{flex:0 0 80px;}
 .ss-item{flex:1;background:var(--surface2);border-radius:10px;padding:10px;text-align:center;}
 .ss-val{font-family:'Bebas Neue',cursive;font-size:26px;}
 .ss-lbl{font-size:11px;color:var(--dim);}
+
+/* ===== SCORE INPUT TAB ===== */
+.sc-inn-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:10px;}
+.sc-inn-title{font-family:'Bebas Neue',cursive;font-size:20px;color:var(--gold);margin-bottom:10px;letter-spacing:2px;}
+.sc-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.sc-row-label{font-size:14px;font-weight:700;min-width:80px;color:var(--dim);}
+.sc-row-label.my{color:var(--gold);}
+.sc-btns{display:flex;gap:6px;flex-wrap:wrap;}
+.sc-btn{width:44px;height:44px;border-radius:10px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-family:'Bebas Neue',cursive;font-size:20px;cursor:pointer;transition:all .15s;flex-shrink:0;}
+.sc-btn.active-score{background:var(--gold);color:#1a1a1a;border-color:var(--gold);font-weight:900;}
+.sc-total{background:var(--surface2);border-radius:12px;padding:14px;margin-bottom:14px;display:flex;align-items:center;justify-content:center;gap:16px;}
+.sc-total-my{font-family:'Bebas Neue',cursive;font-size:56px;color:var(--gold);line-height:1;}
+.sc-total-sep{font-family:'Bebas Neue',cursive;font-size:36px;color:var(--dimmer);line-height:1;}
+.sc-total-opp{font-family:'Bebas Neue',cursive;font-size:56px;color:var(--dim);line-height:1;}
+.sc-total-label{font-size:11px;color:var(--dim);text-align:center;margin-top:4px;}
+.sc-result{display:flex;gap:8px;margin-bottom:14px;}
+.sc-result-btn{flex:1;padding:12px;border-radius:10px;border:2px solid var(--border);background:var(--surface);color:var(--dim);font-size:15px;font-weight:900;cursor:pointer;font-family:'Noto Sans JP',sans-serif;transition:all .2s;}
+.sc-result-btn.win{border-color:var(--gold);background:rgba(240,192,64,.15);color:var(--gold);}
+.sc-result-btn.lose{border-color:var(--rb);background:rgba(231,76,60,.1);color:var(--rb);}
+.sc-result-btn.draw{border-color:var(--dim);background:var(--surface2);color:var(--dim);}
 </style>
 </head>
 <body>
 <div id="sync-badge" style="display:none;position:fixed;top:70px;right:14px;background:#2ecc71;color:#fff;font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;z-index:250;">✅ 保存済み</div>
 <div class="g-hdr">
-  <div><div class="g-hdr-logo">⚾ MUSASEN</div><div class="g-hdr-sub" id="game-info-disp">東京スカイツリーグ</div></div>
-  <div class="g-hdr-score" id="score-hdr" style="display:none;"><div class="g-score-num"><span id="my-sc">0</span>－<span id="opp-sc">0</span></div><div class="g-score-inn" id="inn-disp">スコア</div></div>
-  <button class="btn-summary" id="btn-summary" onclick="openSummary()" style="display:none;">転記用<br>まとめ</button>
+  <div style="flex:1;min-width:0;">
+    <div class="g-hdr-logo">⚾ MUSASEN</div>
+    <div class="g-hdr-sub" id="game-info-disp">東京スカイツリーグ</div>
+  </div>
+  <button class="btn-summary" id="btn-summary" onclick="openSummary()" style="display:none;font-size:11px;">転記用<br>まとめ</button>
 </div>
 <!-- 試合リスト -->
 <div id="screen-score" class="screen active">
@@ -240,8 +262,13 @@ select.sel.sel-pos{flex:0 0 80px;}
 <div id="screen-scoreinput" class="screen">
   <div class="sub-tabs" style="justify-content:flex-start;gap:0;">
     <button onclick="backToGameList()" style="background:none;border:none;border-right:1px solid var(--border);color:var(--gold);font-size:15px;padding:11px 16px;cursor:pointer;font-weight:700;">← 戻る</button>
-    <div class="sub-tab active" onclick="showSubTab('bat')" style="flex:1;">⚾ 打撃入力</div>
-    <div class="sub-tab" onclick="showSubTab('pit')" style="flex:1;">🎽 投手入力</div>
+    <div class="sub-tab" onclick="showSubTab('score')" style="flex:1;">🔢 点数</div>
+    <div class="sub-tab active" onclick="showSubTab('bat')" style="flex:1;">⚾ 打撃</div>
+    <div class="sub-tab" onclick="showSubTab('pit')" style="flex:1;">🎽 投手</div>
+  </div>
+  <!-- 点数入力タブ -->
+  <div id="subtab-score" style="display:none;">
+    <div id="score-input-wrap" style="padding:14px 12px;"></div>
   </div>
   <div id="subtab-bat">
     <div class="half-bar">
@@ -349,7 +376,7 @@ async function loadGames(){
     const{data,error}=await sb.from('games').select('*').order('date',{ascending:false});
     if(error){console.error('Supabase error:',error.message,error);showSync(false);renderGameList();return;}
     console.log('loadGames: got',data?data.length:0,'rows');
-    games=data.map(r=>({id:r.id,opp:r.opp,date:r.date,venue:r.venue,status:r.status,orders:r.orders||9,scores:r.scores,batters:r.batters,pinchHitters:r.pinch_hitters,pitchers:r.pitchers,finalScore:r.final_score}));
+    games=data.map(r=>({id:r.id,opp:r.opp,date:r.date,venue:r.venue,status:r.status,orders:r.orders||9,scores:r.scores,batters:r.batters,pinchHitters:r.pinch_hitters,pitchers:r.pitchers,finalScore:r.final_score,matchResult:r.match_result}));
     console.log('loadGames: games=',games.length);
     renderGameList();
   } catch(e) {
@@ -359,7 +386,7 @@ async function loadGames(){
 }
 async function saveGameToSupabase(g){
   try {
-    const{error}=await sb.from('games').upsert({id:g.id,opp:g.opp,date:g.date,venue:g.venue,status:g.status,orders:g.orders||9,scores:g.scores,batters:g.batters,pinch_hitters:g.pinchHitters,pitchers:g.pitchers,final_score:g.finalScore,updated_at:new Date().toISOString()});
+    const{error}=await sb.from('games').upsert({id:g.id,opp:g.opp,date:g.date,venue:g.venue,status:g.status,orders:g.orders||9,scores:g.scores,batters:g.batters,pinch_hitters:g.pinchHitters,pitchers:g.pitchers,final_score:g.finalScore,match_result:g.matchResult||null,updated_at:new Date().toISOString()});
     showSync(!error);
     if(error)console.error('save error:',error.message,error);
   } catch(e) {
@@ -368,7 +395,7 @@ async function saveGameToSupabase(g){
   }
 }
 function scheduleSave(){if(!currentGame)return;clearTimeout(saveTimer);saveTimer=setTimeout(()=>saveCurrentGame(),1500);}
-function saveCurrentGame(){if(!currentGame)return;currentGame.batters=JSON.parse(JSON.stringify(batters));currentGame.scores=JSON.parse(JSON.stringify(scores));currentGame.pitchers=JSON.parse(JSON.stringify(pitchers));currentGame.pinchHitters=JSON.parse(JSON.stringify(pinchHitters||{top:{},bot:{}}));currentGame.orders=ORDERS;let my=0,opp=0;for(let i=1;i<=INNINGS;i++){my+=scores[i].top||0;opp+=scores[i].bot||0;}currentGame.finalScore={my,opp};saveGameToSupabase(currentGame);}
+function saveCurrentGame(){if(!currentGame)return;currentGame.batters=JSON.parse(JSON.stringify(batters));currentGame.scores=JSON.parse(JSON.stringify(scores));currentGame.pitchers=JSON.parse(JSON.stringify(pitchers));currentGame.pinchHitters=JSON.parse(JSON.stringify(pinchHitters||{top:{},bot:{}}));currentGame.orders=ORDERS;let my=0,opp=0;for(let i=1;i<=INNINGS;i++){my+=scores[i].top||0;opp+=scores[i].bot||0;}currentGame.finalScore={my,opp};if(currentGame.matchResult)currentGame.status=currentGame.status||'inprogress';saveGameToSupabase(currentGame);}
 function subscribeRealtime(){sb.channel('games-rt').on('postgres_changes',{event:'*',schema:'public',table:'games'},payload=>{if(!currentGame||(payload.new&&payload.new.id!==currentGame.id))loadGames();}).subscribe();}
 // MASTER DATA
 const MEMBERS=[{num:1,name:'至'},{num:2,name:'大谷'},{num:3,name:'まつ'},{num:4,name:'古田'},{num:5,name:'田中'},{num:6,name:'太田'},{num:8,name:'伊藤'},{num:9,name:'うすい'},{num:10,name:'梅澤'},{num:11,name:'ソク'},{num:12,name:'前田'},{num:13,name:'安倍'},{num:14,name:'竹林'},{num:17,name:'難波'},{num:18,name:'青木'},{num:23,name:'しんぺい'},{num:24,name:'梶原'},{num:25,name:'笹野'},{num:31,name:'大住'},{num:44,name:'新江'},{num:45,name:'ガク'},{num:47,name:'すいみ～'},{num:55,name:'村野'},{num:66,name:'てつ'},{num:77,name:'貢司'},{num:99,name:'ケイタ'},{num:120,name:'たくま'}];
@@ -510,7 +537,7 @@ function gameCard(g){
   const borderColor=g.status==='inprogress'?'var(--gb)':isUp?'var(--gold)':'var(--dimmer)';
   const logoStyle=isUp?'border-color:var(--gold);color:var(--gold);background:rgba(240,192,64,.1);':'';
   let scoreHtml='',badgeHtml='';
-  if(g.status==='done'&&g.finalScore){const isWin=g.finalScore.my>g.finalScore.opp;scoreHtml=`<div style="font-family:'Bebas Neue',cursive;font-size:28px;color:${isWin?'var(--gold)':'var(--rb)'};">${g.finalScore.my}-${g.finalScore.opp}</div>`;badgeHtml=`<div style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:10px;background:${isWin?'rgba(240,192,64,.15)':'var(--surface2)'};color:${isWin?'var(--gold)':'var(--dimmer)'};">${isWin?'WIN':'LOSE'}</div>`;}
+  if(g.status==='done'&&g.finalScore){const isWin=g.matchResult==='勝'||(g.matchResult!=='負'&&g.matchResult!=='分'&&g.finalScore.my>g.finalScore.opp);scoreHtml=`<div style="font-family:'Bebas Neue',cursive;font-size:28px;color:${isWin?'var(--gold)':'var(--rb)'};">${g.finalScore.my}-${g.finalScore.opp}</div>`;badgeHtml=`<div style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:10px;background:${isWin?'rgba(240,192,64,.15)':'var(--surface2)'};color:${isWin?'var(--gold)':'var(--dimmer)'};">${isWin?'WIN':'LOSE'}</div>`;}
   else if(g.status==='inprogress')badgeHtml='<div style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:10px;background:rgba(46,204,113,.15);color:var(--gb);">● 進行中</div>';
   else badgeHtml='<div style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:10px;background:rgba(240,192,64,.15);color:var(--gold);">予定</div>';
   return`<div style="background:var(--surface);border:1px solid var(--border);border-left:4px solid ${borderColor};border-radius:14px;padding:16px;margin-bottom:10px;cursor:pointer;display:flex;align-items:center;gap:14px;" onclick="openGame('${g.id}')">
@@ -537,8 +564,6 @@ function openGame(gameId){
   const g=games.find(x=>x.id===gameId);if(!g)return;
   currentGame=g;
   document.getElementById('game-info-disp').textContent='vs '+g.opp;
-  document.getElementById('score-hdr').style.display='block';
-  document.getElementById('btn-summary').style.display='block';
   ORDERS=g.orders||9;
   if(g.batters){batters=JSON.parse(JSON.stringify(g.batters));pinchHitters=JSON.parse(JSON.stringify(g.pinchHitters||{top:{},bot:{}}));}
   else{['top','bot'].forEach(h=>{batters[h]={};for(let o=1;o<=ORDERS;o++)batters[h][o]={name:'',pos:'',results:{}};});pinchHitters={top:{},bot:{}};DEFAULT_LINEUP.forEach(d=>{const m=MEMBERS.find(x=>x.num===d.num);if(m){batters.top[d.o].name=m.name+'('+m.num+')';batters.top[d.o].pos=d.pos;}});}
@@ -548,12 +573,10 @@ function openGame(gameId){
   else pitchers={my:[],opp:[]};
   if(g.status==='upcoming'){g.status='inprogress';saveGameToSupabase(g);}
   showScreen('scoreinput');
-  setTimeout(()=>{renderBatters();updateScoreHeader();renderPitchers('my');renderPitchers('opp');showSubTab('bat');},50);
+  setTimeout(()=>{renderBatters();renderPitchers('my');renderPitchers('opp');showSubTab('score');},50);
 }
 async function backToGameList(){
   saveCurrentGame();
-  document.getElementById('score-hdr').style.display='none';
-  document.getElementById('btn-summary').style.display='none';
   document.getElementById('game-info-disp').textContent='東京スカイツリーグ';
   currentGame=null;
   await loadGames();
@@ -561,7 +584,16 @@ async function backToGameList(){
 }
 // SCORE
 function setHalf(h){curHalf=h;document.getElementById('h-top').classList.toggle('active',h==='top');document.getElementById('h-bot').classList.toggle('active',h==='bot');updateScoreHeader();renderBatters();}
-function updateScoreHeader(){let my=0,opp=0;for(let i=1;i<=INNINGS;i++){my+=scores[i].top||0;opp+=scores[i].bot||0;}const myEl=document.getElementById('my-sc');const oppEl=document.getElementById('opp-sc');if(myEl)myEl.textContent=my;if(oppEl)oppEl.textContent=opp;}
+function updateScoreHeader(){
+  // スコアをcurrentGameに反映
+  if(currentGame){
+    let my=0,opp=0;
+    for(let i=1;i<=INNINGS;i++){my+=scores[i].top||0;opp+=scores[i].bot||0;}
+    currentGame.finalScore={my,opp};
+  }
+  // 点数入力画面が開いていれば再描画
+  if(document.getElementById('subtab-score').style.display!=='none') renderScoreInput();
+}
 // BATTERS
 function makeInnRow(half,orderKey,isPinch,pidx){
   const src=isPinch?pinchHitters[half][orderKey][pidx]:batters[half][orderKey];
@@ -650,7 +682,11 @@ function recalcScore(half,inning){
   for(let o=1;o<=ORDERS;o++){const arr=batters[half][o]?.results[inning];if(arr)(Array.isArray(arr)?arr:[arr]).forEach(r=>{t+=r.rbi||0;});(pinchHitters[half][o]||[]).forEach(p=>{const pa=p.results[inning];if(pa)(Array.isArray(pa)?pa:[pa]).forEach(r=>{t+=r.rbi||0;});});}
   scores[inning][half]=t;
 }
-function showSubTab(name){['bat','pit'].forEach(t=>{document.getElementById('subtab-'+t).style.display=t===name?'block':'none';});document.querySelectorAll('.sub-tab').forEach((el,i)=>el.classList.toggle('active',['bat','pit'][i]===name));}
+function showSubTab(name){
+  ['score','bat','pit'].forEach(t=>{document.getElementById('subtab-'+t).style.display=t===name?'block':'none';});
+  document.querySelectorAll('.sub-tab').forEach((el,i)=>el.classList.toggle('active',['score','bat','pit'][i]===name));
+  if(name==='score') renderScoreInput();
+}
 // PITCHERS
 function addPitcher(side){pitchers[side].push({name:'',ip:0,ip3:0,er:0,r:0,so:0,bb:0,hbp:0,h:0,hr:0,wp:0,result:'-'});renderPitchers(side);}
 function removePitcher(side,idx){pitchers[side].splice(idx,1);renderPitchers(side);}
@@ -751,6 +787,75 @@ function renderResults(){
   });
   el.innerHTML=html;
 }
+
+// ============================================================
+// 点数入力
+// ============================================================
+function renderScoreInput(){
+  const wrap = document.getElementById('score-input-wrap');
+  if(!wrap) return;
+
+  // 合計スコア
+  let myTotal=0, oppTotal=0;
+  for(let i=1;i<=INNINGS;i++){myTotal+=scores[i].top||0;oppTotal+=scores[i].bot||0;}
+
+  // 結果判定
+  const result = currentGame ? (currentGame.matchResult||'') : '';
+
+  let html = `
+    <div class="sc-total">
+      <div style="text-align:center;">
+        <div class="sc-total-my">${myTotal}</div>
+        <div class="sc-total-label">ムサセン</div>
+      </div>
+      <div class="sc-total-sep">-</div>
+      <div style="text-align:center;">
+        <div class="sc-total-opp">${oppTotal}</div>
+        <div class="sc-total-label">${currentGame?currentGame.opp:'相手'}</div>
+      </div>
+    </div>
+    <div class="sc-result">
+      <button class="sc-result-btn${result==='勝'?' win':''}" onclick="setMatchResult('勝')">🏆 勝ち</button>
+      <button class="sc-result-btn${result==='負'?' lose':''}" onclick="setMatchResult('負')">😞 負け</button>
+      <button class="sc-result-btn${result==='分'?' draw':''}" onclick="setMatchResult('分')">🤝 引き分け</button>
+    </div>`;
+
+  // イニングごとの入力
+  for(let i=1;i<=INNINGS;i++){
+    const myScore = scores[i].top || 0;
+    const oppScore = scores[i].bot || 0;
+    html += `<div class="sc-inn-card">
+      <div class="sc-inn-title">${i}回</div>
+      <div class="sc-row">
+        <div class="sc-row-label my">ムサセン</div>
+        <div class="sc-btns">${[0,1,2,3,4,5,6,7,8,9].map(n=>`<button class="sc-btn${myScore===n?' active-score':''}" onclick="setScore(${i},'top',${n})">${n}</button>`).join('')}</div>
+      </div>
+      <div class="sc-row">
+        <div class="sc-row-label">相手</div>
+        <div class="sc-btns">${[0,1,2,3,4,5,6,7,8,9].map(n=>`<button class="sc-btn${oppScore===n?' active-score':''}" onclick="setScore(${i},'bot',${n})">${n}</button>`).join('')}</div>
+      </div>
+    </div>`;
+  }
+
+  wrap.innerHTML = html;
+}
+
+function setScore(inning, half, val){
+  scores[inning][half] = val;
+  updateScoreHeader();
+  scheduleSave();
+  renderScoreInput();
+}
+
+function setMatchResult(result){
+  if(!currentGame) return;
+  currentGame.matchResult = result;
+  // 勝敗でstatusをdoneに
+  if(result==='勝'||result==='負'||result==='分') currentGame.status='done';
+  scheduleSave();
+  renderScoreInput();
+}
+
 function showArcMode(name){
   ['ranking','team','results'].forEach(m=>{document.getElementById('arc-'+m).style.display=m===name?'block':'none';});
   document.getElementById('arcbtn-ranking').classList.toggle('active',name==='ranking');
