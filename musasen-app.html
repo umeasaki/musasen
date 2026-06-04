@@ -222,11 +222,11 @@ tr:hover td{background:rgba(240,192,64,.05);}
     <div class="g-hdr-logo">⚾ MUSASEN</div>
     <div class="g-hdr-sub" id="game-info-disp">東京スカイツリーグ</div>
   </div>
-  <div class="g-hdr-score" id="score-hdr" style="display:none;">
+  <div class="g-hdr-score" id="score-hdr">
     <div class="g-score-num"><span id="my-sc">0</span>－<span id="opp-sc">0</span></div>
     <div class="g-score-inn" id="inn-disp">1回表</div>
   </div>
-  <button class="btn-summary" id="btn-summary" onclick="openSummary()" style="display:none;">転記用<br>まとめ</button>
+  <button class="btn-summary" id="btn-summary" onclick="openSummary()">転記用<br>まとめ</button>
 </div>
 
 <!-- ===== SCREEN: SCORE INPUT ===== -->
@@ -502,8 +502,7 @@ window.addEventListener('DOMContentLoaded',()=>{
   arcEl.style.visibility = '';
   arcEl.style.pointerEvents = '';
 
-  const opp=prompt('相手チーム名を入力してください（キャンセルで後で設定）','');
-  if(opp){document.getElementById('game-info-disp').textContent='vs '+opp;document.getElementById('score-hdr').style.display='block';document.getElementById('btn-summary').style.display='block';}
+  // 相手チーム名は転記まとめ画面で設定可能
 });
 
 // ============================================================
@@ -655,6 +654,12 @@ function renderPitchers(side){
 // SUMMARY
 // ============================================================
 function openSummary(){
+  // 相手チーム名が未設定なら入力を促す
+  const dispEl = document.getElementById('game-info-disp');
+  if(dispEl.textContent === '東京スカイツリーグ' || dispEl.textContent === '') {
+    const opp = prompt('相手チーム名を入力してください', '');
+    if(opp) dispEl.textContent = 'vs ' + opp;
+  }
   let html='';
   // スコアボード
   html+='<div class="s-sec">スコアボード</div><div style="overflow-x:auto"><table class="s-tbl"><thead><tr><th>チーム</th>';
