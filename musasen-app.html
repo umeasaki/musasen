@@ -691,7 +691,73 @@ function openSummary(){
 function closeSummary(){document.getElementById('sum-modal').classList.remove('open');}
 function copyText(id){const el=document.getElementById(id);if(navigator.clipboard)navigator.clipboard.writeText(el.textContent).then(()=>alert('コピーしました！'));else{const r=document.createRange();r.selectNode(el);window.getSelection().removeAllRanges();window.getSelection().addRange(r);document.execCommand('copy');alert('コピーしました！');}}
 const GAS_URL='https://script.google.com/macros/s/AKfycbxlQu-oxVoZ7K_JWAorO36kwNaQ6GxeZF0QtyJXuGPkF7LiCBLZWBrBpxURevhW9euo/exec';
-function sendToSheets(){if(!GAS_URL){alert('スプレッドシート連携の設定がまだです。\nmusasen-setup.htmlを参照してください。');return;}alert('送信機能はGAS URLを設定後に利用できます。');}
+
+function sendToSheets(){
+  if(!GAS_URL){
+    alert('GAS URLが設定されていません。');
+    return;
+  }
+  // スコアと選手データを集計
+  const opp = document.getElementById('game-info-disp').textContent.replace('vs ','');
+  const today = new Date().toLocaleDateString('ja-JP');
+  let myT=0, oppT=0;
+  const innScores=[];
+  for(let i=1;i<=INNINGS;i++){
+    myT+=scores[i].top||0; oppT+=scores[i].bot||0;
+    innScores.push({inn:i, my:scores[i].top||0, opp:scores[i].bot||0});
+  }
+  // 打撃成績集計
+  const battingRows=[];
+  for(let o=1;o<=ORDERS;o++){
+    const b=batters.top[o];
+    if(!b.name) continue;
+    let ab=0,h=0,hr=0,rbi=0,bb=0,hbp=0,so=0,sac=0,d=0,t=0;
+    const cells=[];
+    for(let i=1;i<=INNINGS;i++){
+      const arr=b.results[i];
+      if(!arr){cells.push('');continue;}
+      const abArr=Array.isArray(arr)?arr:[arr];
+      const lbls=abArr.map(r=>{
+        if(!['四球','死球','犠打'].includes(r.type)) ab++;
+        if(r.type==='H') h++;
+        if(r.type==='二塁打'){h++;d++;}
+        if(r.type==='三塁打'){h++;t++;}
+        if(r.type==='本塁打'){h++;hr++;}
+        if(r.type==='四球') bb++;
+        if(r.type==='死球') hbp++;
+        if(r.type==='三振') so++;
+        if(r.type==='犠打') sac++;
+        rbi+=r.rbi||0;
+        return r.detail||r.type;
+      });
+      cells.push(lbls.join('/'));
+    }
+    battingRows.push({order:o,name:b.name,pos:b.pos||'',sub:b.sub||'',ab,h,d,t,hr,rbi,bb,hbp,so,sac,cells});
+  }
+  // 投手成績
+  const pitcherRows=pitchers.my.map((p,i)=>({
+    order:i+1, name:p.name,
+    ip:p.ip+'.'+(p.ip3===0?'0':p.ip3===1?'1':'2'),
+    er:p.er, r:p.r, so:p.so, bb:p.bb, hbp:p.hbp, h:p.h, hr:p.hr, wp:p.wp,
+    result:p.result
+  }));
+  const payload={date:today,opp,myScore:myT,oppScore:oppT,innScores,battingRows,pitcherRows};
+  const btn=document.getElementById('btn-send-sheets');
+  btn.textContent='送信中...'; btn.disabled=true;
+  fetch(GAS_URL,{
+    method:'POST',
+    mode:'no-cors',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify(payload)
+  }).then(()=>{
+    btn.textContent='✅ 送信完了！';
+    setTimeout(()=>{btn.textContent='📤 スプレッドシートに記録';btn.disabled=false;},3000);
+  }).catch(err=>{
+    btn.textContent='❌ 送信失敗';
+    btn.disabled=false;
+    alert('送信に失敗しました。\n'+err);
+  });
+}
 
 // ============================================================
 // ARCHIVE
