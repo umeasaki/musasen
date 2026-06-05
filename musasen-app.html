@@ -268,10 +268,7 @@ select.sel.sel-pos{flex:0 0 80px;}
 <div id="screen-score" class="screen active">
   <div class="gamelist-wrap">
     <button class="btn-new-game" onclick="openNewGame()">＋ 試合を作成</button>
-    <div class="gamelist-sec">予定・進行中</div>
-    <div id="gamelist-upcoming"></div>
-    <div class="gamelist-sec" style="margin-top:16px;">過去の試合</div>
-    <div id="gamelist-done"></div>
+    <div id="gamelist-all"></div>
   </div>
 </div>
 <!-- スコア入力 -->
@@ -546,32 +543,24 @@ function showScreen(name){
 }
 // GAME LIST
 function renderGameList(){
-  const upEl=document.getElementById('gamelist-upcoming');
-  const doneEl=document.getElementById('gamelist-done');
-  if(!upEl){console.error('gamelist-upcoming not found!');return;}
-  // 日付で降順ソート（新しい順）、ステータスに関わらず順番を維持
-  const sorted=[...games].sort((a,b)=>{
-    const da=a.date||'';const db=b.date||'';
-    return db.localeCompare(da);
-  });
-  const upcoming=sorted.filter(g=>g.status==='upcoming'||g.status==='inprogress');
-  const done=sorted.filter(g=>g.status==='done');
-  upEl.innerHTML=upcoming.length?upcoming.map(g=>gameCard(g)).join(''):'<p style="color:var(--dimmer);font-size:14px;padding:10px 0;">予定されている試合はありません</p>';
-  doneEl.innerHTML=done.length?done.map(g=>gameCard(g)).join(''):'<p style="color:var(--dimmer);font-size:14px;padding:10px 0;">記録済みの試合はありません</p>';
+  const el=document.getElementById('gamelist-all');
+  if(!el) return;
+  const sorted=[...games].sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+  el.innerHTML=sorted.length?sorted.map(g=>gameCard(g)).join(''):'<p style="color:var(--dimmer);font-size:14px;padding:10px 0;">試合がありません</p>';
 }
 function gameCard(g){
   const initial=getTeamInitial(g.opp);
-  const isUp=g.status==='upcoming'||g.status==='inprogress';
-  const borderColor=g.status==='inprogress'?'var(--gb)':isUp?'var(--gold)':'var(--dimmer)';
-  const logoStyle=isUp?'border-color:var(--gold);color:var(--gold);background:rgba(240,192,64,.1);':'';
-  let scoreHtml='',badgeHtml='';
-  if(g.status==='done'&&g.finalScore){const isWin=g.matchResult==='勝'||(g.matchResult!=='負'&&g.matchResult!=='分'&&g.finalScore.my>g.finalScore.opp);scoreHtml=`<div style="font-family:'Bebas Neue',cursive;font-size:28px;color:${isWin?'var(--gold)':'var(--rb)'};">${g.finalScore.my}-${g.finalScore.opp}</div>`;badgeHtml=`<div style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:10px;background:${isWin?'rgba(240,192,64,.15)':'var(--surface2)'};color:${isWin?'var(--gold)':'var(--dimmer)'};">${isWin?'WIN':'LOSE'}</div>`;}
-  else if(g.status==='inprogress')badgeHtml='<div style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:10px;background:rgba(46,204,113,.15);color:var(--gb);">● 進行中</div>';
-  else badgeHtml='<div style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:10px;background:rgba(240,192,64,.15);color:var(--gold);">予定</div>';
-  return`<div style="background:var(--surface);border:1px solid var(--border);border-left:4px solid ${borderColor};border-radius:14px;padding:16px;margin-bottom:10px;cursor:pointer;display:flex;align-items:center;gap:14px;" onclick="openGame('${g.id}')">
-    <div style="width:52px;height:52px;border-radius:12px;background:var(--surface2);border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;font-family:'Bebas Neue',cursive;flex-shrink:0;${logoStyle}">${initial}</div>
+  let rightHtml='';
+  if(g.finalScore&&(g.finalScore.my||g.finalScore.opp)){
+    const isWin=g.matchResult==='勝'||(g.matchResult!=='負'&&g.matchResult!=='分'&&g.finalScore.my>g.finalScore.opp);
+    const scoreColor=isWin?'var(--gold)':'var(--rb)';
+    rightHtml=`<div style="font-family:'Bebas Neue',cursive;font-size:28px;color:${scoreColor};line-height:1;">${g.finalScore.my}-${g.finalScore.opp}</div>
+      <div style="font-size:11px;font-weight:700;color:${scoreColor};">${isWin?'WIN':'LOSE'}</div>`;
+  }
+  return`<div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:10px;cursor:pointer;display:flex;align-items:center;gap:14px;" onclick="openGame('${g.id}')">
+    <div style="width:52px;height:52px;border-radius:12px;background:var(--surface2);border:2px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;font-family:'Bebas Neue',cursive;color:var(--gold);flex-shrink:0;">${initial}</div>
     <div style="flex:1;min-width:0;"><div style="font-size:17px;font-weight:700;margin-bottom:3px;">vs ${g.opp}</div><div style="font-size:12px;color:var(--dim);margin-bottom:3px;">📅 ${g.date}</div><div style="font-size:11px;color:var(--dimmer);">📍 ${g.venue}</div></div>
-    <div style="text-align:right;flex-shrink:0;">${scoreHtml}${badgeHtml}</div>
+    <div style="text-align:right;flex-shrink:0;">${rightHtml}</div>
   </div>`;
 }
 function openNewGame(){const now=new Date();now.setMinutes(0);document.getElementById('ng-date').value=now.toISOString().slice(0,16);document.getElementById('ng-opp').value='';document.getElementById('ng-venue').value='';document.getElementById('newgame-modal').classList.add('open');}
