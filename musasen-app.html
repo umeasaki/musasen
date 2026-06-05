@@ -612,11 +612,6 @@ function saveAndBack(){
   showScreen('score');
 }
 function tempSave(){ saveAndBack(); }
-  saveCurrentGame();
-  const btn = event.target;
-  btn.textContent='✅ 保存済み';
-  setTimeout(()=>{btn.textContent='一時保存';},2000);
-}
 
 function confirmScore(){
   if(!currentGame) return;
