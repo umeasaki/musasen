@@ -132,8 +132,9 @@ select.sel.sel-pos{flex:0 0 80px;}
 .arc-mode-btn.active{background:var(--gold);color:#1a1a1a;border-color:var(--gold);}
 .year-bar{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;}
 .yr-btn{padding:8px 16px;border-radius:20px;border:1px solid var(--border);background:var(--surface);color:var(--dim);font-size:13px;font-weight:700;cursor:pointer;transition:all .15s;}
-.yr-btn.active{background:var(--gold);color:#1a1a1a;border-color:var(--gold);}
+.yr-btn.active{background:var(--gold);color:#1a1a1a !important;border-color:var(--gold);font-weight:900;}
 .yr-btn.all{border-color:var(--gold);color:var(--gold);}
+.yr-btn.all.active{background:var(--gold);color:#1a1a1a !important;font-weight:900;}
 .a-sec{font-size:13px;color:var(--dim);letter-spacing:1.5px;font-weight:700;margin:16px 0 8px;display:flex;align-items:center;gap:7px;}
 .a-sec::after{content:'';flex:1;height:1px;background:var(--border);}
 .cc-stat{text-align:center;background:var(--surface2);border-radius:6px;padding:7px 4px;}
@@ -185,7 +186,7 @@ select.sel.sel-pos{flex:0 0 80px;}
 /* 対戦結果 */
 .res-yr-bar{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;}
 .res-yr-btn{padding:8px 16px;border-radius:20px;border:1px solid var(--border);background:var(--surface);color:var(--dim);font-size:13px;font-weight:700;cursor:pointer;}
-.res-yr-btn.active{background:var(--gold);color:#1a1a1a;border-color:var(--gold);}
+.res-yr-btn.active{background:var(--gold);color:#1a1a1a !important;border-color:var(--gold);font-weight:900;}
 .game-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:12px 14px;margin-bottom:10px;}
 .game-card.win{border-top:3px solid var(--gold);}
 .game-card.lose{border-top:3px solid var(--rb);}
@@ -248,11 +249,6 @@ select.sel.sel-pos{flex:0 0 80px;}
 .num-btn:active{transform:scale(.92);}
 .num-btn.selected{background:var(--gold);color:#1a1a1a;border-color:var(--gold);}
 .num-cancel{width:100%;padding:13px;border-radius:12px;border:1px solid var(--border);background:transparent;color:var(--dim);font-size:15px;cursor:pointer;font-family:'Noto Sans JP',sans-serif;}
-.sc-result{display:flex;gap:8px;margin-bottom:14px;}
-.sc-result-btn{flex:1;padding:13px;border-radius:12px;border:2px solid var(--border);background:var(--surface);color:var(--dim);font-size:15px;font-weight:900;cursor:pointer;font-family:'Noto Sans JP',sans-serif;transition:all .2s;}
-.sc-result-btn.win{border-color:var(--gold);background:rgba(240,192,64,.15);color:var(--gold);}
-.sc-result-btn.lose{border-color:var(--rb);background:rgba(231,76,60,.1);color:var(--rb);}
-.sc-result-btn.draw{border-color:var(--dim);background:var(--surface2);color:var(--dim);}
 </style>
 </head>
 <body>
@@ -276,11 +272,14 @@ select.sel.sel-pos{flex:0 0 80px;}
 </div>
 <!-- スコア入力 -->
 <div id="screen-scoreinput" class="screen">
-  <div class="sub-tabs" style="justify-content:flex-start;gap:0;">
-    <button onclick="backToGameList()" style="background:none;border:none;border-right:1px solid var(--border);color:var(--gold);font-size:15px;padding:11px 16px;cursor:pointer;font-weight:700;">← 戻る</button>
-    <div class="sub-tab" onclick="showSubTab('score')" style="flex:1;">🔢 点数</div>
-    <div class="sub-tab active" onclick="showSubTab('bat')" style="flex:1;">⚾ 打撃</div>
-    <div class="sub-tab" onclick="showSubTab('pit')" style="flex:1;">🎽 投手</div>
+  <div style="background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:56px;z-index:150;">
+    <div class="sub-tabs" style="gap:0;border-bottom:none;">
+      <div class="sub-tab" onclick="showSubTab('score')" style="flex:1;">🔢 点数</div>
+      <div class="sub-tab active" onclick="showSubTab('bat')" style="flex:1;">⚾ 打撃</div>
+      <div class="sub-tab" onclick="showSubTab('pit')" style="flex:1;">🎽 投手</div>
+      <button onclick="tempSave()" style="background:var(--surface2);border:none;border-left:1px solid var(--border);color:var(--dim);font-size:12px;font-weight:700;padding:0 12px;cursor:pointer;font-family:'Noto Sans JP',sans-serif;white-space:nowrap;">一時保存</button>
+      <button onclick="confirmScore()" style="background:var(--gold);border:none;color:#1a1a1a;font-size:12px;font-weight:900;padding:0 12px;cursor:pointer;font-family:'Noto Sans JP',sans-serif;white-space:nowrap;">スコア確定</button>
+    </div>
   </div>
   <!-- 点数入力タブ -->
   <div id="subtab-score" style="display:none;">
@@ -288,8 +287,8 @@ select.sel.sel-pos{flex:0 0 80px;}
   </div>
   <div id="subtab-bat">
     <div class="half-bar">
-      <button class="half-btn active" id="h-top" onclick="setHalf('top')">🔺 表（ムサセン攻撃）</button>
-      <button class="half-btn" id="h-bot" onclick="setHalf('bot')">🔻 裏（相手攻撃）</button>
+      <button class="half-btn active" id="h-top" onclick="setHalf('top')">ムサセン攻撃</button>
+      <button class="half-btn" id="h-bot" onclick="setHalf('bot')">相手攻撃</button>
     </div>
     <div id="bat-list"></div>
   </div>
@@ -420,7 +419,7 @@ async function saveGameToSupabase(g){
   }
 }
 function scheduleSave(){if(!currentGame)return;clearTimeout(saveTimer);saveTimer=setTimeout(()=>saveCurrentGame(),1500);}
-function saveCurrentGame(){if(!currentGame)return;currentGame.batters=JSON.parse(JSON.stringify(batters));currentGame.scores=JSON.parse(JSON.stringify(scores));currentGame.pitchers=JSON.parse(JSON.stringify(pitchers));currentGame.pinchHitters=JSON.parse(JSON.stringify(pinchHitters||{top:{},bot:{}}));currentGame.orders=ORDERS;let my=0,opp=0;for(let i=1;i<=INNINGS;i++){my+=scores[i].top||0;opp+=scores[i].bot||0;}currentGame.finalScore={my,opp};if(currentGame.matchResult)currentGame.status=currentGame.status||'inprogress';saveGameToSupabase(currentGame);}
+function saveCurrentGame(){if(!currentGame)return;currentGame.batters=JSON.parse(JSON.stringify(batters));currentGame.scores=JSON.parse(JSON.stringify(scores));currentGame.pitchers=JSON.parse(JSON.stringify(pitchers));currentGame.pinchHitters=JSON.parse(JSON.stringify(pinchHitters||{top:{},bot:{}}));currentGame.orders=ORDERS;let my=0,opp=0;for(let i=1;i<=INNINGS;i++){my+=scores[i].top||0;opp+=scores[i].bot||0;}currentGame.finalScore={my,opp};currentGame.matchResult=my>opp?'勝':my<opp?'負':my===opp&&my>0?'分':null;if(currentGame.matchResult)currentGame.status='done';saveGameToSupabase(currentGame);}
 function subscribeRealtime(){sb.channel('games-rt').on('postgres_changes',{event:'*',schema:'public',table:'games'},payload=>{if(!currentGame||(payload.new&&payload.new.id!==currentGame.id))loadGames();}).subscribe();}
 // MASTER DATA
 const MEMBERS=[{num:1,name:'至'},{num:2,name:'大谷'},{num:3,name:'まつ'},{num:4,name:'古田'},{num:5,name:'田中'},{num:6,name:'太田'},{num:8,name:'伊藤'},{num:9,name:'うすい'},{num:10,name:'梅澤'},{num:11,name:'ソク'},{num:12,name:'前田'},{num:13,name:'安倍'},{num:14,name:'竹林'},{num:17,name:'難波'},{num:18,name:'青木'},{num:23,name:'しんぺい'},{num:24,name:'梶原'},{num:25,name:'笹野'},{num:31,name:'大住'},{num:44,name:'新江'},{num:45,name:'ガク'},{num:47,name:'すいみ～'},{num:55,name:'村野'},{num:66,name:'てつ'},{num:77,name:'貢司'},{num:99,name:'ケイタ'},{num:120,name:'たくま'}];
@@ -538,7 +537,9 @@ window.addEventListener('DOMContentLoaded',async()=>{
 function showScreen(name){
   ['score','archive','scoreinput'].forEach(s=>{const el=document.getElementById('screen-'+s);if(el)el.classList.remove('active');});
   document.getElementById('screen-'+name).classList.add('active');
-  ['score','archive'].forEach(s=>{document.getElementById('nav-'+s).classList.toggle('active',s===name||(s==='score'&&name==='scoreinput'));});
+  ['score','archive'].forEach(s=>{document.getElementById('nav-'+s).classList.toggle('active',s===name);});
+  // scoreinput中はナビ非表示
+  document.querySelector('.main-nav').style.display = name==='scoreinput' ? 'none' : 'flex';
   if(name==='archive')renderRanking();
 }
 // GAME LIST
@@ -600,6 +601,31 @@ function openGame(gameId){
   showScreen('scoreinput');
   setTimeout(()=>{renderBatters();renderPitchers('my');renderPitchers('opp');showSubTab('score');},50);
 }
+
+function tempSave(){
+  saveCurrentGame();
+  const btn = event.target;
+  btn.textContent='✅ 保存済み';
+  setTimeout(()=>{btn.textContent='一時保存';},2000);
+}
+
+function confirmScore(){
+  if(!currentGame) return;
+  saveCurrentGame();
+  // 合計スコアで勝敗確定
+  let my=0,opp=0;
+  for(let i=1;i<=INNINGS;i++){my+=scores[i].top||0;opp+=scores[i].bot||0;}
+  currentGame.finalScore={my,opp};
+  currentGame.matchResult=my>opp?'勝':my<opp?'負':my===opp&&my>0?'分':null;
+  if(currentGame.matchResult) currentGame.status='done';
+  saveGameToSupabase(currentGame);
+  // 試合リストへ戻る
+  document.getElementById('game-info-disp').textContent='東京スカイツリーグ';
+  currentGame=null;
+  loadGames();
+  showScreen('score');
+}
+
 async function backToGameList(){
   saveCurrentGame();
   document.getElementById('game-info-disp').textContent='東京スカイツリーグ';
@@ -644,7 +670,14 @@ function renderBatters(){
     const topRow=document.createElement('div');topRow.className='bat-row-top';
     const nd=document.createElement('div');nd.className='bat-num';nd.textContent=o;topRow.appendChild(nd);
     const selWrap=document.createElement('div');selWrap.className='bat-selects';
-    const ns=document.createElement('select');ns.className='sel';ns.innerHTML=memberOptions(b.name);ns.onchange=(ord=>e=>{batters[curHalf][ord].name=e.target.value;scheduleSave();})(o);selWrap.appendChild(ns);
+    let ns;
+    if(curHalf==='bot'){
+      ns=document.createElement('input');ns.type='text';ns.className='sel';ns.placeholder='選手名';ns.value=b.name||'';
+      ns.oninput=(ord=>e=>{batters[curHalf][ord].name=e.target.value;scheduleSave();})(o);
+    }else{
+      ns=document.createElement('select');ns.className='sel';ns.innerHTML=memberOptions(b.name);ns.onchange=(ord=>e=>{batters[curHalf][ord].name=e.target.value;scheduleSave();})(o);
+    }
+    selWrap.appendChild(ns);
     const ps=document.createElement('select');ps.className='sel sel-pos';ps.innerHTML=posOptions(b.pos);ps.onchange=(ord=>e=>{batters[curHalf][ord].pos=e.target.value;scheduleSave();})(o);selWrap.appendChild(ps);
     const db=document.createElement('button');db.className='btn-daida';db.textContent='＋代打';db.onclick=(ord=>()=>addPinchHitter(curHalf,ord))(o);selWrap.appendChild(db);
     topRow.appendChild(selWrap);card.appendChild(topRow);
@@ -851,7 +884,6 @@ function renderScoreInput(){
 
   let myTotal=0, oppTotal=0;
   for(let i=1;i<=INNINGS;i++){myTotal+=scores[i].top||0;oppTotal+=scores[i].bot||0;}
-  const result = currentGame ? (currentGame.matchResult||'') : '';
   const oppName = currentGame ? currentGame.opp : '相手';
 
   // 縦型スコアボード
@@ -879,23 +911,12 @@ function renderScoreInput(){
         <div class="sb-total-score my">${myTotal}</div>
         <div class="sb-total-score">${oppTotal}</div>
       </div>
-      <div class="sc-result">
-        <button class="sc-result-btn${result==='勝'?' win':''}" onclick="setMatchResult('勝')">🏆 勝ち</button>
-        <button class="sc-result-btn${result==='負'?' lose':''}" onclick="setMatchResult('負')">😞 負け</button>
-        <button class="sc-result-btn${result==='分'?' draw':''}" onclick="setMatchResult('分')">🤝 引き分け</button>
-      </div>
+
     </div>`;
 
   wrap.innerHTML = html;
 }
 
-function setMatchResult(result){
-  if(!currentGame) return;
-  currentGame.matchResult = result;
-  if(result==='勝'||result==='負'||result==='分') currentGame.status='done';
-  scheduleSave();
-  renderScoreInput();
-}
 
 function showArcMode(name){
   ['ranking','team','results'].forEach(m=>{document.getElementById('arc-'+m).style.display=m===name?'block':'none';});
