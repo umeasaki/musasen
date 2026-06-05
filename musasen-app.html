@@ -218,22 +218,32 @@ select.sel.sel-pos{flex:0 0 80px;}
 .ss-val{font-family:'Bebas Neue',cursive;font-size:26px;}
 .ss-lbl{font-size:11px;color:var(--dim);}
 
-/* ===== SCORE INPUT TAB ===== */
-.sc-inn-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:10px;}
-.sc-inn-title{font-family:'Bebas Neue',cursive;font-size:20px;color:var(--gold);margin-bottom:10px;letter-spacing:2px;}
-.sc-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
-.sc-row-label{font-size:14px;font-weight:700;min-width:80px;color:var(--dim);}
-.sc-row-label.my{color:var(--gold);}
-.sc-btns{display:flex;gap:6px;flex-wrap:wrap;}
-.sc-btn{width:44px;height:44px;border-radius:10px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-family:'Bebas Neue',cursive;font-size:20px;cursor:pointer;transition:all .15s;flex-shrink:0;}
-.sc-btn.active-score{background:var(--gold);color:#1a1a1a;border-color:var(--gold);font-weight:900;}
-.sc-total{background:var(--surface2);border-radius:12px;padding:14px;margin-bottom:14px;display:flex;align-items:center;justify-content:center;gap:16px;}
-.sc-total-my{font-family:'Bebas Neue',cursive;font-size:56px;color:var(--gold);line-height:1;}
-.sc-total-sep{font-family:'Bebas Neue',cursive;font-size:36px;color:var(--dimmer);line-height:1;}
-.sc-total-opp{font-family:'Bebas Neue',cursive;font-size:56px;color:var(--dim);line-height:1;}
-.sc-total-label{font-size:11px;color:var(--dim);text-align:center;margin-top:4px;}
+/* ===== SCORE BOARD ===== */
+.scoreboard-wrap{padding:14px 10px;}
+.scoreboard-table{width:100%;border-collapse:collapse;background:var(--surface);border-radius:12px;overflow:hidden;border:1px solid var(--border);margin-bottom:16px;}
+.scoreboard-table th{background:var(--surface2);color:var(--dimmer);font-size:13px;padding:10px 4px;text-align:center;font-weight:700;border-bottom:2px solid var(--border);}
+.scoreboard-table th.team-col{text-align:left;padding-left:12px;min-width:90px;}
+.scoreboard-table th.total-col{color:var(--gold);border-left:1px solid var(--border);}
+.sc-cell{font-family:'Bebas Neue',cursive;font-size:22px;text-align:center;padding:12px 4px;cursor:pointer;transition:background .15s;border-top:1px solid var(--border);color:var(--text);}
+.sc-cell:active{background:rgba(240,192,64,.2);}
+.sc-cell.my-row{color:var(--gold);}
+.sc-cell.opp-row{color:var(--text);}
+.sc-cell.total-cell{font-size:26px;font-weight:900;border-left:1px solid var(--border);}
+.sc-cell.total-cell.my-row{color:var(--gold);}
+.sc-team-name{text-align:left;padding:12px 12px;font-size:14px;font-weight:700;border-top:1px solid var(--border);}
+.sc-team-name.my-row{color:var(--gold);}
+/* 数字入力モーダル */
+.num-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:500;align-items:flex-end;justify-content:center;}
+.num-modal.open{display:flex;}
+.num-sheet{background:var(--surface);border-radius:22px 22px 0 0;padding:20px 16px 36px;width:100%;max-width:480px;animation:up .2s ease;}
+.num-title{font-size:15px;color:var(--dim);font-weight:700;margin-bottom:16px;text-align:center;}
+.num-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:12px;}
+.num-btn{height:60px;border-radius:12px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-family:'Bebas Neue',cursive;font-size:28px;cursor:pointer;transition:all .15s;}
+.num-btn:active{transform:scale(.92);}
+.num-btn.selected{background:var(--gold);color:#1a1a1a;border-color:var(--gold);}
+.num-cancel{width:100%;padding:13px;border-radius:12px;border:1px solid var(--border);background:transparent;color:var(--dim);font-size:15px;cursor:pointer;font-family:'Noto Sans JP',sans-serif;}
 .sc-result{display:flex;gap:8px;margin-bottom:14px;}
-.sc-result-btn{flex:1;padding:12px;border-radius:10px;border:2px solid var(--border);background:var(--surface);color:var(--dim);font-size:15px;font-weight:900;cursor:pointer;font-family:'Noto Sans JP',sans-serif;transition:all .2s;}
+.sc-result-btn{flex:1;padding:13px;border-radius:12px;border:2px solid var(--border);background:var(--surface);color:var(--dim);font-size:15px;font-weight:900;cursor:pointer;font-family:'Noto Sans JP',sans-serif;transition:all .2s;}
 .sc-result-btn.win{border-color:var(--gold);background:rgba(240,192,64,.15);color:var(--gold);}
 .sc-result-btn.lose{border-color:var(--rb);background:rgba(231,76,60,.1);color:var(--rb);}
 .sc-result-btn.draw{border-color:var(--dim);background:var(--surface2);color:var(--dim);}
@@ -352,6 +362,15 @@ select.sel.sel-pos{flex:0 0 80px;}
     </div>
   </div>
 </div>
+<!-- 数字入力モーダル -->
+<div class="num-modal" id="num-modal" onclick="closeNumModal(event)">
+  <div class="num-sheet" onclick="event.stopPropagation()">
+    <div class="num-title" id="num-title">点数を選択</div>
+    <div class="num-grid" id="num-grid"></div>
+    <button class="num-cancel" onclick="closeNumModal()">キャンセル</button>
+  </div>
+</div>
+
 <!-- 新規試合モーダル -->
 <div class="newgame-overlay" id="newgame-modal" onclick="closeNewGame(event)">
   <div class="newgame-sheet" onclick="event.stopPropagation()">
@@ -791,66 +810,92 @@ function renderResults(){
 // ============================================================
 // 点数入力
 // ============================================================
-function renderScoreInput(){
-  const wrap = document.getElementById('score-input-wrap');
-  if(!wrap) return;
+// 数字入力モーダル管理
+let numTarget = {inning:null, half:null};
 
-  // 合計スコア
-  let myTotal=0, oppTotal=0;
-  for(let i=1;i<=INNINGS;i++){myTotal+=scores[i].top||0;oppTotal+=scores[i].bot||0;}
-
-  // 結果判定
-  const result = currentGame ? (currentGame.matchResult||'') : '';
-
-  let html = `
-    <div class="sc-total">
-      <div style="text-align:center;">
-        <div class="sc-total-my">${myTotal}</div>
-        <div class="sc-total-label">ムサセン</div>
-      </div>
-      <div class="sc-total-sep">-</div>
-      <div style="text-align:center;">
-        <div class="sc-total-opp">${oppTotal}</div>
-        <div class="sc-total-label">${currentGame?currentGame.opp:'相手'}</div>
-      </div>
-    </div>
-    <div class="sc-result">
-      <button class="sc-result-btn${result==='勝'?' win':''}" onclick="setMatchResult('勝')">🏆 勝ち</button>
-      <button class="sc-result-btn${result==='負'?' lose':''}" onclick="setMatchResult('負')">😞 負け</button>
-      <button class="sc-result-btn${result==='分'?' draw':''}" onclick="setMatchResult('分')">🤝 引き分け</button>
-    </div>`;
-
-  // イニングごとの入力
-  for(let i=1;i<=INNINGS;i++){
-    const myScore = scores[i].top || 0;
-    const oppScore = scores[i].bot || 0;
-    html += `<div class="sc-inn-card">
-      <div class="sc-inn-title">${i}回</div>
-      <div class="sc-row">
-        <div class="sc-row-label my">ムサセン</div>
-        <div class="sc-btns">${[0,1,2,3,4,5,6,7,8,9].map(n=>`<button class="sc-btn${myScore===n?' active-score':''}" onclick="setScore(${i},'top',${n})">${n}</button>`).join('')}</div>
-      </div>
-      <div class="sc-row">
-        <div class="sc-row-label">相手</div>
-        <div class="sc-btns">${[0,1,2,3,4,5,6,7,8,9].map(n=>`<button class="sc-btn${oppScore===n?' active-score':''}" onclick="setScore(${i},'bot',${n})">${n}</button>`).join('')}</div>
-      </div>
-    </div>`;
-  }
-
-  wrap.innerHTML = html;
+function openNumModal(inning, half){
+  numTarget = {inning, half};
+  const cur = scores[inning][half] || 0;
+  const teamName = half==='top' ? 'ムサセン' : (currentGame?currentGame.opp:'相手');
+  document.getElementById('num-title').textContent = inning + '回 ' + (half==='top'?'表':'裏') + '（' + teamName + '）';
+  const grid = document.getElementById('num-grid');
+  grid.innerHTML = [0,1,2,3,4,5,6,7,8,9,10].map(n =>
+    `<button class="num-btn${cur===n?' selected':''}" onclick="pickNum(${n})">${n}</button>`
+  ).join('');
+  document.getElementById('num-modal').classList.add('open');
 }
 
-function setScore(inning, half, val){
+function pickNum(val){
+  const {inning, half} = numTarget;
   scores[inning][half] = val;
+  closeNumModal();
   updateScoreHeader();
   scheduleSave();
   renderScoreInput();
 }
 
+function closeNumModal(e){
+  if(!e || e.target===document.getElementById('num-modal'))
+    document.getElementById('num-modal').classList.remove('open');
+}
+
+function renderScoreInput(){
+  const wrap = document.getElementById('score-input-wrap');
+  if(!wrap) return;
+
+  let myTotal=0, oppTotal=0;
+  for(let i=1;i<=INNINGS;i++){myTotal+=scores[i].top||0;oppTotal+=scores[i].bot||0;}
+  const result = currentGame ? (currentGame.matchResult||'') : '';
+  const oppName = currentGame ? currentGame.opp : '相手';
+
+  // スコアボード表
+  let innHeaders = '';
+  let myRow = '';
+  let oppRow = '';
+  for(let i=1;i<=INNINGS;i++){
+    innHeaders += `<th>${i}</th>`;
+    myRow  += `<td class="sc-cell my-row"  onclick="openNumModal(${i},'top')">${scores[i].top??0}</td>`;
+    oppRow += `<td class="sc-cell opp-row" onclick="openNumModal(${i},'bot')">${scores[i].bot??0}</td>`;
+  }
+
+  const html = `
+    <div class="scoreboard-wrap">
+      <div style="overflow-x:auto;">
+        <table class="scoreboard-table">
+          <thead>
+            <tr>
+              <th class="team-col">チーム</th>
+              ${innHeaders}
+              <th class="total-col">計</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="sc-team-name my-row">ムサセン</td>
+              ${myRow}
+              <td class="sc-cell total-cell my-row">${myTotal}</td>
+            </tr>
+            <tr>
+              <td class="sc-team-name">${oppName}</td>
+              ${oppRow}
+              <td class="sc-cell total-cell">${oppTotal}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="sc-result">
+        <button class="sc-result-btn${result==='勝'?' win':''}" onclick="setMatchResult('勝')">🏆 勝ち</button>
+        <button class="sc-result-btn${result==='負'?' lose':''}" onclick="setMatchResult('負')">😞 負け</button>
+        <button class="sc-result-btn${result==='分'?' draw':''}" onclick="setMatchResult('分')">🤝 引き分け</button>
+      </div>
+    </div>`;
+
+  wrap.innerHTML = html;
+}
+
 function setMatchResult(result){
   if(!currentGame) return;
   currentGame.matchResult = result;
-  // 勝敗でstatusをdoneに
   if(result==='勝'||result==='負'||result==='分') currentGame.status='done';
   scheduleSave();
   renderScoreInput();
